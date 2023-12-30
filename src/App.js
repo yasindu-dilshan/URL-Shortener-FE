@@ -1,24 +1,34 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import ShortenerBar from "./components/Shortener/ShortenerBar";
+import ShortUrl from "./components/ShortUrl/ShortUrl";
 
 function App() {
+  const [longUrl, setLongUrl] = useState('');
+  const [shortUrl, setShortUrl] = useState('');
+
+  const shortenUrl = async () => {
+    const response = await fetch('http://localhost:8080/shorten', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `longUrl=${longUrl}`,
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      setShortUrl("http://localhost:8080/yd/"+result.shortUrl);
+    } else {
+      console.error('Failed to shorten URL');
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className="App">
+        <ShortenerBar longUrl={longUrl} setLongUrl={setLongUrl} shortenUrl={shortenUrl}/>
+        <ShortUrl shortUrl={shortUrl}/>
+      </div>
   );
 }
 
